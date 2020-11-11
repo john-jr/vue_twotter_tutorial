@@ -2,7 +2,8 @@
   <div class="user-profile">
     <div class="user-profile__sidebar">
       <div class="user-profile__user-panel">
-        <h1 class="user-profile__username">@{{ state.user.userName }}</h1>
+        <h1 class="user-profile__username">@{{ state.user.username }}</h1>
+       
         <div class="user-profile__admin-badge" v-if="state.user.isAdmin">Admin</div>
         <div class="user-profile__follower-count">
           <strong> Followers: </strong> {{ state.followers }}
@@ -14,9 +15,8 @@
       <TwootItem
         v-for="twoot in state.user.twoots"
         :key="twoot.id"
-        :username="state.user.userName"
-        :twoot="twoot"
-       
+        :username="state.user.username"
+        :twoot="twoot" 
       />
     </div>
   </div>
@@ -24,37 +24,33 @@
 
 <script>
 
-import { reactive} from 'vue';
-import TwootItem from "./TwootItem";
-import CreateTwootPanel from "./CreateTwootPanel";
+import { reactive,  computed} from 'vue';
+ import { useRoute } from 'vue-router'; 
+ import { users } from "../assets/users"
+import TwootItem from "../components/TwootItem";
+import CreateTwootPanel from "../components/CreateTwootPanel";
 
 export default {
   name: "UserProfile",
   components: { TwootItem, CreateTwootPanel },
   setup(){
+
+     const route = useRoute();
+    const userId = computed(() => route.params.userId); 
     const state = reactive ({
       followers: 0,
-      user:{
-        id: 1,
-        userName: "_GJM",
-        firstName: "Jono",
-        lastName: "GJM",
-        email: "fakeuser@gmail.com",
-        isAdmin: true,
-        twoots: [
-          {id: 1, content: 'Twooter is Amazing'},
-          {id: 2, content: 'Vue.js people are weebs xD'}
-        ]
-      }
+      user: users[userId.value - 1] || users[0]
+        
     });
-   function addTwoot(twoot) {
+function addTwoot(twoot) {
       state.user.twoots.unshift({ id: state.user.twoots.length + 1, content: twoot });
     }
 
 
   return{
     state,
-    addTwoot
+    addTwoot,
+    userId
   }
   }
 };
